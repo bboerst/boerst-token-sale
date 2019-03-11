@@ -12,21 +12,47 @@ contract BoerstToken {
         uint256 _value
     );
 
+    event Approval(
+        address indexed _tokenOwner,
+        address indexed _spender,
+        uint _tokens
+    );
+
     mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
 
     constructor (uint256 _initialSupply) public {
         balanceOf[msg.sender] = _initialSupply;
         totalSupply = _initialSupply;
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);
+    function transfer(address _to, uint _tokens) public returns (bool success) {
+        require(balanceOf[msg.sender] >= _tokens, "Sender balance must be greater than or equal to the amount to transfer.");
 
-        balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;
+        balanceOf[msg.sender] -= _tokens;
+        balanceOf[_to] += _tokens;
 
-        emit Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _tokens);
 
         return true;
     }
+
+    function approve(address _spender, uint _tokens) public returns (bool success) {
+        allowance[msg.sender][_spender] = _tokens;
+        emit Approval(msg.sender, _spender, _tokens);
+        return true;
+    }
+
+    function transferFrom(address _from, address _to, uint _tokens) public returns (bool success){
+        require(_tokens <= balanceOf[_from], "From balance must be greater than or equal to the amount to transfer.");
+        require(allowance[msg.sender][_from] >= _tokens, "Sender balance must be allowed to spend the requested amount.");
+
+        balanceOf[msg.sender] -= _tokens;
+        balanceOf[_to] += _tokens;
+        
+        emit Transfer(msg.sender, _to, _tokens);
+
+        return true;
+    }
+
 }
