@@ -27,7 +27,7 @@ contract BoerstToken {
     }
 
     function transfer(address _to, uint _tokens) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _tokens, "Sender balance must be greater than or equal to the amount to transfer.");
+        require(balanceOf[msg.sender] >= _tokens, "Not enough balance to complete the transfer.");
 
         balanceOf[msg.sender] -= _tokens;
         balanceOf[_to] += _tokens;
@@ -46,8 +46,8 @@ contract BoerstToken {
     }
 
     function transferFrom(address _from, address _to, uint _tokens) public returns (bool success){
-        require(_tokens <= balanceOf[_from], "From balance must be greater than or equal to the amount to transfer.");
-        require(_tokens <= allowance[_from][msg.sender], "Sender balance must be allowed to spend the requested amount.");
+        require(_tokens <= balanceOf[_from], "Not enough balance to complete the transfer.");
+        require(_tokens <= allowance[_from][msg.sender], "Sender is not allowed to spend the requested amount.");
 
         balanceOf[_from] -= _tokens;
         balanceOf[_to] += _tokens;
