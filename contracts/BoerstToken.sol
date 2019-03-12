@@ -9,7 +9,7 @@ contract BoerstToken {
     event Transfer(
         address indexed _from,
         address indexed _to,
-        uint256 _value
+        uint256 _tokens
     );
 
     event Approval(
@@ -39,20 +39,23 @@ contract BoerstToken {
 
     function approve(address _spender, uint _tokens) public returns (bool success) {
         allowance[msg.sender][_spender] = _tokens;
+
         emit Approval(msg.sender, _spender, _tokens);
+
         return true;
     }
 
     function transferFrom(address _from, address _to, uint _tokens) public returns (bool success){
         require(_tokens <= balanceOf[_from], "From balance must be greater than or equal to the amount to transfer.");
-        require(allowance[msg.sender][_from] >= _tokens, "Sender balance must be allowed to spend the requested amount.");
+        require(_tokens <= allowance[_from][msg.sender], "Sender balance must be allowed to spend the requested amount.");
 
-        balanceOf[msg.sender] -= _tokens;
+        balanceOf[_from] -= _tokens;
         balanceOf[_to] += _tokens;
         
-        emit Transfer(msg.sender, _to, _tokens);
+        allowance[_from][msg.sender] -= _tokens;
+        
+        emit Transfer(_from, _to, _tokens);
 
         return true;
     }
-
 }
